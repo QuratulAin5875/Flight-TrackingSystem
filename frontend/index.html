@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlightAware - Flight Tracking System</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>✈️ FlightAware</h1>
+            <p>Real-time Flight Tracking System</p>
+        </header>
+        
+        <div class="main-content">
+    <div class="sidebar">
+                <div class="section">
+                    <h3>📡 Send Flight Data</h3>
+                    <form id="flightForm">
+                        <div class="form-group">
+                            <label for="flightId">Flight ID:</label>
+                            <input type="text" id="flightId" placeholder="e.g., AA123" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="latitude">Latitude:</label>
+                            <input type="number" id="latitude" step="0.000001" placeholder="40.7128" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="longitude">Longitude:</label>
+                            <input type="number" id="longitude" step="0.000001" placeholder="-74.0060" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="altitude">Altitude (ft):</label>
+                            <input type="number" id="altitude" placeholder="35000" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="speed">Speed (knots):</label>
+                            <input type="number" id="speed" placeholder="450" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="heading">Heading (degrees):</label>
+                            <input type="number" id="heading" min="0" max="360" placeholder="270" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="status">Status:</label>
+                            <select id="status" required>
+                                <option value="en-route">En Route</option>
+                                <option value="departed">Departed</option>
+                                <option value="landed">Landed</option>
+                                <option value="delayed">Delayed</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="source">Source Airport:</label>
+                            <select id="source">
+                                <option value="">Select Source</option>
+                                <option value="JFK">JFK - New York</option>
+                                <option value="LAX">LAX - Los Angeles</option>
+                                <option value="ORD">ORD - Chicago</option>
+                                <option value="DFW">DFW - Dallas</option>
+                                <option value="ATL">ATL - Atlanta</option>
+                                <option value="DEN">DEN - Denver</option>
+                                <option value="SFO">SFO - San Francisco</option>
+                                <option value="SEA">SEA - Seattle</option>
+                                <option value="BOS">BOS - Boston</option>
+                                <option value="MIA">MIA - Miami</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="destination">Destination Airport:</label>
+                            <select id="destination">
+                                <option value="">Select Destination</option>
+                                <option value="JFK">JFK - New York</option>
+                                <option value="LAX">LAX - Los Angeles</option>
+                                <option value="ORD">ORD - Chicago</option>
+                                <option value="DFW">DFW - Dallas</option>
+                                <option value="ATL">ATL - Atlanta</option>
+                                <option value="DEN">DEN - Denver</option>
+                                <option value="SFO">SFO - San Francisco</option>
+                                <option value="SEA">SEA - Seattle</option>
+                                <option value="BOS">BOS - Boston</option>
+                                <option value="MIA">MIA - Miami</option>
+                            </select>
+                        </div>
+                        <button type="submit">Send Data</button>
+                    </form>
+                </div>
+
+                <div class="section">
+                    <h3>🔍 Track Flight</h3>
+                    <div class="form-group">
+                        <label for="trackFlightId">Flight ID:</label>
+                        <input type="text" id="trackFlightId" placeholder="Enter flight ID">
+                        <button onclick="trackFlight()">Track</button>
+                    </div>
+                    <div class="form-group">
+                        <label for="trackTime">At Time (optional):</label>
+                        <input type="datetime-local" id="trackTime">
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>📊 Flight Info</h3>
+                    <div id="flightInfo" class="flight-info"></div>
+                </div>
+
+                <div class="section">
+                    <h3>🛫 Active Flights</h3>
+                    <div class="section-controls">
+                        <button onclick="loadActiveFlights()">Refresh</button>
+                        <button onclick="startLiveTrackingAll()" class="start-all-btn">🔴 Live All</button>
+                        <button onclick="stopLiveTrackingAll()" class="stop-all-btn">⏹️ Stop All</button>
+                    </div>
+                    <div id="activeFlights" class="flights-list"></div>
+                </div>
+
+                <div class="section">
+                    <h3>🔴 Live Tracking</h3>
+                    <div id="liveTrackingStatus" class="live-status">
+                        <p>No flights being tracked live</p>
+                    </div>
+                    <div id="liveFlights" class="live-flights-list"></div>
+                </div>
+
+                <div class="section">
+                    <h3>✅ Completed Flights</h3>
+                    <div class="section-controls">
+                        <button onclick="loadCompletedFlights()">Refresh</button>
+                        <button onclick="autoCompleteFlights()" class="auto-complete-btn">🔄 Auto-Complete</button>
+                    </div>
+                    <div id="completedFlights" class="completed-flights-list"></div>
+                </div>
+
+                <div class="section">
+                    <h3>📊 System Stats</h3>
+                    <div id="systemStats" class="system-stats"></div>
+                </div>
+
+                <div class="section">
+                    <h3>✈️ Flight Progress</h3>
+                    <div id="flightProgress" class="flight-progress"></div>
+                </div>
+  </div>
+
+            <div class="map-container">
+                <div id="map"></div>
+                <div class="map-controls">
+                    <button onclick="clearMap()">Clear Map</button>
+                    <button onclick="centerMap()">Center Map</button>
+                    <button onclick="showAllFlightPaths()">Show All Paths</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
